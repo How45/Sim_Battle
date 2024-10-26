@@ -1,6 +1,9 @@
 .venv/
 __pycache__
 
+# No JSON files storing
+pokemon-data/
+
 # Maven ignores
 target/
 pom.xml.tag

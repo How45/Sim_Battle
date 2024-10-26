@@ -1,7 +1,8 @@
 import unittest
+import json
 import poke_api as poke
 from icecream import ic
-from pokebase import pokemon
+from pokebase import pokemon, APIResource
 
 class PokemonTest(unittest.TestCase):
 
@@ -21,7 +22,7 @@ class PokemonTest(unittest.TestCase):
         self.pikachu.stat_calculation(81)
         ic(self.pikachu.lvl_base_stat)
         ic(self.pikachu.random_values)
-    
+
     def moves_retrieve(self) -> None:
         self.pikachu.normalise(self.raw_pokemon_data)
 
@@ -29,6 +30,22 @@ class PokemonTest(unittest.TestCase):
         self.pikachu.pokemon_move('thunder-shock')
 
         ic(self.pikachu.move_set)
+
+    def export_json(self) -> None:
+        poke_name: str = 'bulbasaur'
+        random_pokemon: APIResource = pokemon(poke_name)
+        radom_poke = poke.Pokemon_info()
+
+        radom_poke.normalise(random_pokemon)
+        radom_poke.stat_calculation(9)
+
+        moves : list[str] = ['growl', 'tackle', 'leech-seed']
+
+        for m in moves:
+            radom_poke.pokemon_move(m)
+
+        with open(f'C:\\Users\\Menu\\Documents\\Projects\\Pokemon_sim\\sim-battle\\pokemon-data\\{poke_name}.json', 'w', encoding='utf-8') as f:
+            json.dump(radom_poke.__dict__, f, indent=4)
 
 
 

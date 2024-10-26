@@ -23,7 +23,7 @@ class Pokemon_info():
         pokemon : APIResource
             This is the pokemon data that was retreived from the API
         """
-        self.pokemon_info['Name'] = pokemon.name
+        self.pokemon_info['name'] = pokemon.name
 
         pokemon_stat = {}
         base_stat: APIMetadata
@@ -37,9 +37,9 @@ class Pokemon_info():
 
         # Retrieving Type data
         # There can only be two types on a pokemon
-        self.pokemon_info['Type1'] = pokemon.types[0].type.name
+        self.pokemon_info['type1'] = pokemon.types[0].type.name
         try:
-            self.pokemon_info['Type2'] = pokemon.types[1].type.name
+            self.pokemon_info['type2'] = pokemon.types[1].type.name
         except IndexError as e:
             print(f"{e}: Pokemon doesn't have a second type")
 
@@ -60,6 +60,8 @@ class Pokemon_info():
         random_values : dict
             The numbers that the base stats where updated from. The order -> [DV, EV]
         """
+
+        self.pokemon_info['level'] = lvl
 
         # -> Should be returned for the PDF purpouse (LATER THING WE WILL NEED TO PROCESS)
         # -> GEN 1 and GEN 2 Calculations only
