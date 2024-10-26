@@ -43,9 +43,10 @@ public class App {
         int attackStat = (int) (long) poke1.getStat("attack");
         int defenceStat = (int) (long) poke2.getStat("defense");
 
+
         // lvl 9 pikachu attacking lvl 9 bulbasaur, using thunderShock (of not very
         // effective and same type attack move)
-        System.out.println("Damage to poke2: " + battle.damageFormula(9, powerMove, attackStat, defenceStat, 0.5,
-                poke1.getCritChance(), 1, 1.5));
+        // System.out.println("Damage to poke2: " + battle.damageFormula(9, powerMove, attackStat, defenceStat, 0.5,
+        //         poke1.getCritChance(), 1, 1.5));
     }
 }

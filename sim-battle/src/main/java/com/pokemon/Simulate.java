@@ -4,6 +4,7 @@ import java.util.Random;
 
 public class Simulate {
 
+    private 
     public int damageFormula(int level, int power, int attackStat, int defenceStat, double type1,
             double type2, double critChance, double stab) {
         // Random number to be 1 or 0
@@ -29,5 +30,10 @@ public class Simulate {
             damage = damage * randomModif <= 1 ? 1 : damage * randomModif;
             return damage;
         }
+    }
+
+    public int effectiveTypeAgainst(String attackType, String defenceType) {
+
+        return 0;
     }
 }
