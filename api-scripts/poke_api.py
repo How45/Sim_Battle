@@ -138,17 +138,17 @@ class Pokemon_info():
             move = poke_move(name)
 
             # Retrievein data that we need
-            move_stat['Category'] = move.damage_class.name
-            move_stat['Accuracy'] = move.accuracy
-            move_stat['Power'] = move.power
-            move_stat['PP'] = move.pp
-            move_stat['Priority'] = move.priority
-            move_stat['Type'] = move.type.name
+            move_stat['category'] = move.damage_class.name
+            move_stat['accuracy'] = move.accuracy
+            move_stat['power'] = move.power
+            move_stat['pp'] = move.pp
+            move_stat['priority'] = move.priority
+            move_stat['type'] = move.type.name
 
             # Aligment might be None
             try:
-                move_stat['Effect'] = move.ailgmnet.name
-                move_stat['Effect_chance'] = move.ailgmnet.ailgmnet_chance
+                move_stat['effect'] = move.ailgmnet.name
+                move_stat['effect_chance'] = move.ailgmnet.ailgmnet_chance
             except AttributeError:
                 print("{e}: Pokemon has no attributes")
 

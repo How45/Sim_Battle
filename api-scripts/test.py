@@ -32,19 +32,19 @@ class PokemonTest(unittest.TestCase):
         ic(self.pikachu.move_set)
 
     def export_json(self) -> None:
-        poke_name: str = 'bulbasaur'
+        poke_name: str = 'pikachu'
         random_pokemon: APIResource = pokemon(poke_name)
         radom_poke = poke.Pokemon_info()
 
         radom_poke.normalise(random_pokemon)
         radom_poke.stat_calculation(9)
 
-        moves : list[str] = ['growl', 'tackle', 'leech-seed']
+        moves : list[str] = ['thunder-shock', 'thunder-wave', 'growl']
 
         for m in moves:
             radom_poke.pokemon_move(m)
 
-        with open(f'C:\\Users\\Menu\\Documents\\Projects\\Pokemon_sim\\sim-battle\\pokemon-data\\{poke_name}.json', 'w', encoding='utf-8') as f:
+        with open(f'{poke_name}.json', 'w', encoding='utf-8') as f:
             json.dump(radom_poke.__dict__, f, indent=4)
 
 
