@@ -5,9 +5,9 @@ import java.util.Random;
 // import org.json.simple.JSONObject;
 
 public class Helper {
-    private String[] strengthElements = { "normal", "fire", "water", "electric", "grass", "grass", "ice", "fighting",
+    private String[] strengthElements = { "normal", "fire", "water", "electric", "grass", "ice", "fighting",
             "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon" };
-    private double[][] strenghtChart = {
+    private double[][] strengthChart = {
             { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5, 0, 1, 1, 0.5 },
             { 1, 0.5, 0.5, 1, 2, 2, 1, 1, 1, 1, 1, 2, 0.5, 1, 0.5, 2 },
             { 1, 2, 0.5, 1, 0.5, 1, 1, 1, 2, 1, 1, 1, 2, 1, 0.5, 1, 1 },
@@ -27,58 +27,44 @@ public class Helper {
             { 1, 1, 1, 1, 1, 1, 0.5, 1, 1, 1, 2, 1, 1, 2, 1, 0.5, 0.5 },
             { 1, 0.5, 0.5, 0.5, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 0.5 } };
 
-    public int damageFormula(int level, int power, int attackStat, int defenceStat, double type1,
+    public int damageFormula(int level, int power, int attackStat, int defenseStat, double type1,
             double type2, double critChance, double stab) {
-        // Random number to be 1 or 0
         Random random = new Random();
         double critRandom = random.nextDouble();
-        int randomModif = (random.nextInt(255 - 217) + 255) / 255;
+        double randomModif = (217 + random.nextInt(39)) / 255.0; // Random between 217 and 255, divided by 255
 
-        // Crit chance is calculated based on the speed of pokemon
-        int cirtical = (critRandom < critChance) ? 1 : 0;
+        int critical = (critRandom < critChance) ? 2 : 1;
 
-        int damage = ((((2 * level * cirtical) / 5) + 2) * power * (attackStat / defenceStat)) / 50;
+        // Basic damage
+        int damage = (int) ((((2 * level * critical) / 5.0 + 2) * power * (attackStat / defenseStat)) / 50) + 2;
 
-        // Damage thus far i
-        int sameAttackDamage = (int) (damage * stab) / 2;
-
-        damage *= sameAttackDamage;
-        if (type1 != 0) {
-            damage *= type1;
+        // Modifier
+        damage *= randomModif;
+        if (critical == 1) {
+            damage *= stab;
         }
-        if (type2 != 0) {
-            damage *= type2;
-        }
+        damage *= type1 * type2;
 
-        if (damage == 1) {
-            return 1;
-        } else {
-            damage = damage * randomModif <= 1 ? 1 : damage * randomModif;
-            return damage;
-        }
+        return Math.max(1, damage);
     }
 
     public double effectiveTypeAgainst(String attackType, String defenceType) {
         int indexAttackType = -1;
         int indexDefenceType = -1;
 
-        if (defenceType == null) {
-            return 0;
+        if (defenceType == null || attackType == null) {
+            return 1;
         }
 
         for (int i = 0; i < strengthElements.length; i++) {
-            if (strengthElements[i] == attackType) {
+            if (strengthElements[i].equals(attackType)) {
                 indexAttackType = i;
             }
-            if (strengthElements[i] == defenceType) {
+            if (strengthElements[i].equals(defenceType)) {
                 indexDefenceType = i;
             }
         }
 
-        if (indexAttackType == -1 || indexDefenceType == -1) {
-            return -1;
-        }
-
-        return strenghtChart[indexAttackType][indexDefenceType];
+        return strengthChart[indexAttackType][indexDefenceType];
     }
 }

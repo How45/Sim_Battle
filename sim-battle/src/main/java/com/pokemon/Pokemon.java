@@ -97,7 +97,7 @@ public class Pokemon {
         return nullMoveObj;
     }
 
-    public int getCritChance() {
+    public double getCritChance() {
         // This is for the caclation of the critical chance in the damage formula
         int speed;
 
@@ -109,8 +109,9 @@ public class Pokemon {
             speed = 0;
         }
 
-        int cal = (speed * this.level) / 512;
-        return cal > 1 ? cal : 1;
+        double critChance = (speed * this.level) / 512;
+
+        return Math.min(critChance, 1.0);
     }
 
     public void setStatusEffect(String typeEffect) {

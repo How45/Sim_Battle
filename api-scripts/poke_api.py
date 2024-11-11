@@ -113,6 +113,7 @@ class Pokemon_info():
         """
         self.random_values[n_stat] = [dv, ev]
 
+        # CONFLICTING SOURCES ON THE *2
         dv_cal : int = (stat + dv)*2
         ev_cal : float = ceil(sqrt(ev))/4
 

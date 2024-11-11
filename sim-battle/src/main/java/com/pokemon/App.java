@@ -15,7 +15,7 @@ public class App {
         int poke1Wins = 0;
         int poke2Wins = 0;
 
-        for (int battles = 0; battles < 1; battles++) {
+        for (int battles = 0; battles < 1000; battles++) {
             int deadPokemon = 0; // Dunno how to have it blank, but probs wont be an issue
             int rounds = 0;
             boolean battleOver = false;
@@ -32,6 +32,7 @@ public class App {
 
                 for (int i = 0; i < 2; i++) {
                     // Get damage
+                    System.out.println(battlingPokemon[starting].getName() + "<---- ATTACKING POKEMON");
                     int damage = starting == 0 ? getDamageMove(battlingPokemon, poke1Move, starting)
                             : getDamageMove(battlingPokemon, poke2Move, starting);
 
@@ -41,6 +42,7 @@ public class App {
                     if (battlingPokemon[starting ^ 1].isDead()) {
                         deadPokemon = starting ^ 1;
                         battleOver = true;
+                        break;
                     }
                     // Switch to next pokemon
                     starting = starting ^ 1;
