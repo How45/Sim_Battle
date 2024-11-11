@@ -116,7 +116,7 @@ class Pokemon_info():
         dv_cal : int = (stat + dv)*2
         ev_cal : float = ceil(sqrt(ev))/4
 
-        # If Hp you +lvl and +10, else +5
+        # If it's Hp you +lvl and +10, else +5
         if n_stat == 'hp':
             self.lvl_base_stat[n_stat] = int((((dv_cal + ev_cal)*lvl)/100))+lvl+10
         else:

@@ -15,7 +15,7 @@ public class App {
         int poke1Wins = 0;
         int poke2Wins = 0;
 
-        for (int battles = 0; battles < 1000; battles++) {
+        for (int battles = 0; battles < 1; battles++) {
             int deadPokemon = 0; // Dunno how to have it blank, but probs wont be an issue
             int rounds = 0;
             boolean battleOver = false;
@@ -82,6 +82,7 @@ public class App {
                     power,
                     attackingStat, defendingStat, effectiveAgainstType1, effectiveAgainstType2,
                     battlingPokemon[starting].getCritChance(), STAB);
+            System.out.println("Move Category: " + move.get("category"));
             return damage;
         }
     }
@@ -105,12 +106,12 @@ public class App {
 
             String name = (String) pokemonInfo.get("name");
             int level = 9; // (int) pokemon1Info.get("level");
-            JSONObject stats = (JSONObject) pokemonInfo.get("stats");
+            JSONObject lvlBaseStat = (JSONObject) i.get("lvl_base_stat");
             JSONObject moveSet = (JSONObject) i.get("move_set");
             String type1 = (String) pokemonInfo.get("type1");
             String type2 = (String) pokemonInfo.get("type2");
 
-            Pokemon createPokemone = new Pokemon(name, stats, moveSet, level, type1, type2);
+            Pokemon createPokemone = new Pokemon(name, lvlBaseStat, moveSet, level, type1, type2);
             battlingPokemon[n] = createPokemone;
 
             n++;
