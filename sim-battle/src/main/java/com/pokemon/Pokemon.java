@@ -45,8 +45,24 @@ public class Pokemon {
         this.hp = this.hp - damage;
     }
 
+    public boolean isDead() {
+        return this.hp <= 0 ? true : false;
+    }
+
     public String getName() {
         return this.name;
+    }
+
+    public int getLevel() {
+        return this.level;
+    }
+
+    public String getType1() {
+        return this.type1;
+    }
+
+    public String getType2() {
+        return this.type2;
     }
 
     public Object getStat(String typeOfStat) {
@@ -73,8 +89,8 @@ public class Pokemon {
         for (String m : set) {
 
             if (i == randMove) {
-                return (JSONObject) this.moveSet.get(m);
-            } // <---- THis case will always
+                return (JSONObject) this.moveSet.get(m); // <---- This case will always be
+            }
             i++;
         }
 
@@ -101,13 +117,13 @@ public class Pokemon {
         this.effect = typeEffect;
     }
 
-    public double[] sameTypeAttack(String moveType) {
-        double[] typeEffectiveness = new double[2];
+    public double sameTypeAttackBase(String moveType) {
+        double typeEffectivenessType1 = moveType == this.type1 ? 1.5 : 1;
+        double typeEffectivenessType2 = moveType == this.type2 ? 1.5 : 1;
 
-        typeEffectiveness[0] = moveType == type1 ? 1.5 : 1;
-        typeEffectiveness[1] = moveType == type2 ? 1.5 : 1;
-
-        return typeEffectiveness;
+        return typeEffectivenessType1 > typeEffectivenessType2 || typeEffectivenessType1 == typeEffectivenessType2
+                ? typeEffectivenessType1
+                : typeEffectivenessType2;
     }
 
 }

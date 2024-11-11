@@ -2,7 +2,11 @@ package com.pokemon;
 
 import java.util.Random;
 
-public class Simulate {
+// import org.json.simple.JSONObject;
+
+public class Helper {
+    private String[] strengthElements = { "normal", "fire", "water", "electric", "grass", "grass", "ice", "fighting",
+            "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon" };
     private double[][] strenghtChart = {
             { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5, 0, 1, 1, 0.5 },
             { 1, 0.5, 0.5, 1, 2, 2, 1, 1, 1, 1, 1, 2, 0.5, 1, 0.5, 2 },
@@ -39,8 +43,12 @@ public class Simulate {
         int sameAttackDamage = (int) (damage * stab) / 2;
 
         damage *= sameAttackDamage;
-        damage *= type1;
-        damage *= type2;
+        if (type1 != 0) {
+            damage *= type1;
+        }
+        if (type2 != 0) {
+            damage *= type2;
+        }
 
         if (damage == 1) {
             return 1;
@@ -50,8 +58,27 @@ public class Simulate {
         }
     }
 
-    public int effectiveTypeAgainst(String attackType, String defenceType) {
+    public double effectiveTypeAgainst(String attackType, String defenceType) {
+        int indexAttackType = -1;
+        int indexDefenceType = -1;
 
-        return 0;
+        if (defenceType == null) {
+            return 0;
+        }
+
+        for (int i = 0; i < strengthElements.length; i++) {
+            if (strengthElements[i] == attackType) {
+                indexAttackType = i;
+            }
+            if (strengthElements[i] == defenceType) {
+                indexDefenceType = i;
+            }
+        }
+
+        if (indexAttackType == -1 || indexDefenceType == -1) {
+            return -1;
+        }
+
+        return strenghtChart[indexAttackType][indexDefenceType];
     }
 }

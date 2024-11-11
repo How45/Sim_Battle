@@ -1,52 +1,109 @@
 package com.pokemon;
 
 import java.io.FileReader;
+import java.io.IOException;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class App {
-    public static void main(String[] args) throws Exception {
+    private static Pokemon[] battlingPokemon = new Pokemon[2];
+    private static Helper hf = new Helper();
+
+    public static void simBattle() {
+        String deadPokemon = "Broken";
+
+        for (int battles = 0; battles < 1; battles++) {
+            boolean battleOver = false;
+            int starting;
+
+            while (!battleOver) {
+
+                JSONObject poke1Move = battlingPokemon[0].moveChoice();
+                JSONObject poke2Move = battlingPokemon[1].moveChoice();
+
+                // Who starts?
+                starting = (long) battlingPokemon[0].getStat("speed") > (long) battlingPokemon[1].getStat("speed") ? 0
+                        : 1;
+
+                for (int i = 0; i < 2; i++) {
+                    // Get damage
+                    int damage = starting == 0 ? getDamageMove(battlingPokemon, poke1Move, starting)
+                            : getDamageMove(battlingPokemon, poke2Move, starting);
+
+                    battlingPokemon[starting ^ 1].reduceHealth(damage);
+                    if (battlingPokemon[starting ^ 1].isDead()) {
+                        deadPokemon = battlingPokemon[starting ^ 1].getName();
+                        battleOver = true;
+                    }
+                    // Switch to next pokemon
+                    starting = starting ^ 1;
+                }
+            }
+            System.out.println("Game End, dead pokemon: " + deadPokemon);
+        }
+    }
+
+    public static int getDamageMove(Pokemon[] battlingPokemon, JSONObject move, int starting) {
+        // Data retrieve
+        int attackingStat = (int) (long) battlingPokemon[starting].getStat("attack");
+        int defendingStat = (int) (long) battlingPokemon[starting ^ 1].getStat("defense");
+
+        Integer power = (Integer) move.get("power");
+        double effectiveAgainstType1 = hf.effectiveTypeAgainst((String) move.get("type"),
+                battlingPokemon[starting ^ 1].getType1());
+        double effectiveAgainstType2 = hf.effectiveTypeAgainst((String) move.get("type"),
+                battlingPokemon[starting ^ 1].getType2());
+        double STAB = battlingPokemon[starting ^ 1].sameTypeAttackBase((String) move.get("type"));
+
+        if (power == null) {
+            // Haven't done this shit yet (effects and buffs )
+            System.err.println(move.get("category"));
+            return 0;
+        } else {
+            // Damage output
+            int damage = hf.damageFormula(battlingPokemon[starting].getLevel(),
+                    power,
+                    attackingStat, defendingStat, effectiveAgainstType1, effectiveAgainstType2,
+                    battlingPokemon[starting].getCritChance(), STAB);
+            return damage;
+        }
+    }
+
+    public static void challangers() throws IOException, ParseException {
         JSONParser jsonparser = new JSONParser();
 
         // pokemon 1
         FileReader poke1File = new FileReader("sim-battle\\pokemon-data\\pikachu.json");
         JSONObject pokemon1 = (JSONObject) jsonparser.parse(poke1File);
-
-        JSONObject pokemon1Info = (JSONObject) pokemon1.get("pokemon_info");
-        JSONObject poke1Moves = (JSONObject) pokemon1.get("move_set");
-
-        String poke1Name = (String) pokemon1Info.get("name");
-        JSONObject poke1Stats = (JSONObject) pokemon1Info.get("stats");
-        int poke1level = 9;// (int) pokemon1Info.get("level");
-
         // Pokemon 2
         FileReader poke2File = new FileReader("sim-battle\\pokemon-data\\bulbasaur.json");
         JSONObject pokemon2 = (JSONObject) jsonparser.parse(poke2File);
 
-        JSONObject pokemon2Info = (JSONObject) pokemon2.get("pokemon_info");
-        JSONObject poke2Moves = (JSONObject) pokemon2.get("move_set");
+        JSONObject[] pokemonObj = { pokemon1, pokemon2 };
 
-        String poke2Name = (String) pokemon2Info.get("name");
-        JSONObject poke2Stats = (JSONObject) pokemon2Info.get("stats");
-        int poke2level = 9;// (int) pokemon2Info.get("level").intValue();
+        // Get data from JSON File
+        int n = 0;
+        for (JSONObject i : pokemonObj) {
+            JSONObject pokemonInfo = (JSONObject) i.get("pokemon_info");
 
-        // System.out.println(pokemonInfo);
-        Pokemon poke1 = new Pokemon(poke1Name, poke1Stats, poke1Moves, poke1level);
-        Pokemon poke2 = new Pokemon(poke2Name, poke2Stats, poke2Moves, poke2level);
+            String name = (String) pokemonInfo.get("name");
+            int level = 9; // (int) pokemon1Info.get("level");
+            JSONObject stats = (JSONObject) pokemonInfo.get("stats");
+            JSONObject moveSet = (JSONObject) i.get("move_set");
+            String type1 = (String) pokemonInfo.get("type1");
+            String type2 = (String) pokemonInfo.get("type2");
 
-        // HARD CODED POKE1 USING ELECTRIC MOVE CALLED "ThunderShock" <--- TEST
-        JSONObject poke1MoveChoice = poke1.moveChoice();
-        Simulate battle = new Simulate();
+            Pokemon createPokemone = new Pokemon(name, stats, moveSet, level, type1, type2);
+            battlingPokemon[n] = createPokemone;
 
-        int powerMove = (int) (long) poke1MoveChoice.get("Power");
-        int attackStat = (int) (long) poke1.getStat("attack");
-        int defenceStat = (int) (long) poke2.getStat("defense");
+            n++;
+        }
+    }
 
-
-        // lvl 9 pikachu attacking lvl 9 bulbasaur, using thunderShock (of not very
-        // effective and same type attack move)
-        // System.out.println("Damage to poke2: " + battle.damageFormula(9, powerMove, attackStat, defenceStat, 0.5,
-        //         poke1.getCritChance(), 1, 1.5));
+    public static void main(String[] args) throws Exception {
+        challangers();
+        simBattle();
     }
 }
