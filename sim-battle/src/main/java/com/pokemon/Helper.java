@@ -67,4 +67,9 @@ public class Helper {
 
         return strengthChart[indexAttackType][indexDefenceType];
     }
+
+    public void resetPokemon(Pokemon[] battlingPokemon) {
+        battlingPokemon[0].resetAll();
+        battlingPokemon[1].resetAll();
+    }
 }

@@ -15,7 +15,7 @@ public class App {
         int poke1Wins = 0;
         int poke2Wins = 0;
 
-        for (int battles = 0; battles < 1000; battles++) {
+        for (int battles = 0; battles < 1; battles++) {
             int deadPokemon = 0; // Dunno how to have it blank, but probs wont be an issue
             int rounds = 0;
             boolean battleOver = false;
@@ -26,13 +26,11 @@ public class App {
                 JSONObject poke1Move = battlingPokemon[0].moveChoice();
                 JSONObject poke2Move = battlingPokemon[1].moveChoice();
 
-                // Who starts?
                 starting = (long) battlingPokemon[0].getStat("speed") > (long) battlingPokemon[1].getStat("speed") ? 0
                         : 1;
 
                 for (int i = 0; i < 2; i++) {
-                    // Get damage
-                    System.out.println(battlingPokemon[starting].getName() + "<---- ATTACKING POKEMON");
+                    System.out.println(battlingPokemon[starting].getName() + "<---- ATTACKING");
                     int damage = starting == 0 ? getDamageMove(battlingPokemon, poke1Move, starting)
                             : getDamageMove(battlingPokemon, poke2Move, starting);
 
@@ -57,9 +55,11 @@ public class App {
             }
             System.out.println("Game End, dead pokemon: " + battlingPokemon[deadPokemon].getName());
 
-            challangers(); // Might have to rethink this 0_0 (this is for the rest of stats and shit)
+            hf.resetPokemon(battlingPokemon);
         }
-        System.out.println("poke1: " + poke1Wins + " poke2: " + poke2Wins);
+        System.out.println("\nWins - " + battlingPokemon[0].getName() + ": " + poke1Wins + " "
+                + battlingPokemon[1].getName() + ": "
+                + poke2Wins);
     }
 
     public static int getDamageMove(Pokemon[] battlingPokemon, JSONObject move, int starting) {
@@ -75,15 +75,17 @@ public class App {
         double STAB = battlingPokemon[starting ^ 1].sameTypeAttackBase((String) move.get("type"));
 
         if (power == null) {
-            // Haven't done this shit yet (effects and buffs )
+            // Status SHIT NEEDS TO BE DONE
             System.out.println("MINOR ERROR: " + move.get("category"));
             return 0;
+
         } else {
             // Damage output
             int damage = hf.damageFormula(battlingPokemon[starting].getLevel(),
                     power,
                     attackingStat, defendingStat, effectiveAgainstType1, effectiveAgainstType2,
                     battlingPokemon[starting].getCritChance(), STAB);
+
             System.out.println("Move Category: " + move.get("category"));
             return damage;
         }

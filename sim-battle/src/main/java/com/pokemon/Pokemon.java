@@ -10,6 +10,7 @@ public class Pokemon {
 
     private String name;
     private int hp;
+    private JSONObject staticStats;
     private JSONObject stats;
     private JSONObject moveSet;
     private int level;
@@ -20,6 +21,7 @@ public class Pokemon {
     public Pokemon(String name, JSONObject stats,
             JSONObject moveSet, int level, String type1, String type2) {
         this.name = name;
+        this.staticStats = stats;
         this.stats = stats;
         this.moveSet = moveSet;
         this.level = level;
@@ -69,29 +71,34 @@ public class Pokemon {
         return this.stats.get(typeOfStat);
     }
 
-    public JSONObject moveChoice() {
-        // String m = "{\"PP\": 20,\"Accuracy\":
-        // 100,\"Type\":\"electric\",\"Category\":\"special\",\"Priority\":0,\"Power\":40}";
-        // JSONObject move = (JSONObject) JSONValue.parse(m);
-        // return move;
+    public Object getAllStats() {
+        return this.stats;
+    }
 
+    public void resetAll() {
+        this.stats = this.staticStats;
+        this.effect = null;
+        this.hp = (int) (long) this.staticStats.get("hp");
+    }
+
+    public JSONObject moveChoice() {
         Set<String> set = this.moveSet.keySet();
         String nullMove = "{\"Category\": null,\"Accuracy\": null,\"Power\":null,\"PP\": null,\"Priority\": null,\"Type\": null}";
         JSONObject nullMoveObj = (JSONObject) JSONValue.parse(nullMove);
 
-        if (set == null || set.isEmpty()) {
-            return nullMoveObj;
-        }
+        if (set != null || !set.isEmpty()) {
 
-        int randMove = new Random().nextInt(set.size());
+            int randMove = new Random().nextInt(set.size());
 
-        int i = 0;
-        for (String m : set) {
+            int i = 0;
+            for (String m : set) {
 
-            if (i == randMove) {
-                return (JSONObject) this.moveSet.get(m); // <---- This case will always be
+                if (i == randMove) {
+                    return (JSONObject) this.moveSet.get(m); // <---- This case will always be
+                }
+
+                i++;
             }
-            i++;
         }
 
         return nullMoveObj;
@@ -110,7 +117,6 @@ public class Pokemon {
         }
 
         double critChance = (speed * this.level) / 512;
-
         return Math.min(critChance, 1.0);
     }
 
