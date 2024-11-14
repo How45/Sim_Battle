@@ -42,6 +42,7 @@ public class App {
                         battleOver = true;
                         break;
                     }
+
                     // Switch to next pokemon
                     starting = starting ^ 1;
                 }
@@ -63,16 +64,7 @@ public class App {
     }
 
     public static int getDamageMove(Pokemon[] battlingPokemon, JSONObject move, int starting) {
-        // Data retrieve
-        int attackingStat = (int) (long) battlingPokemon[starting].getStat("attack");
-        int defendingStat = (int) (long) battlingPokemon[starting ^ 1].getStat("defense");
-
         Integer power = (move.get("power") != null) ? ((Number) move.get("power")).intValue() : null;
-        double effectiveAgainstType1 = hf.effectiveTypeAgainst((String) move.get("type"),
-                battlingPokemon[starting ^ 1].getType1());
-        double effectiveAgainstType2 = hf.effectiveTypeAgainst((String) move.get("type"),
-                battlingPokemon[starting ^ 1].getType2());
-        double STAB = battlingPokemon[starting ^ 1].sameTypeAttackBase((String) move.get("type"));
 
         if (power == null) {
             // Status SHIT NEEDS TO BE DONE
@@ -80,10 +72,23 @@ public class App {
             return 0;
 
         } else {
-            // Damage output
+
+            String moveStatAttack = move.get("category").equals("special") ? "special-attack" : "attack";
+            // Gen 1 Pokemon special is the same. User will have to specify if they are doing gen 1 or not.
+            // Code will only change when calculation baselevelstat is changed at python level.
+            String moveStatDefense = move.get("category").equals("special") ? "special-defense" : "defense";
+            int attackingStat = (int) (long) battlingPokemon[starting].getStat(moveStatAttack);
+            int defendingStat = (int) (long) battlingPokemon[starting ^ 1].getStat(moveStatDefense);
+
+            double effectiveAgainstType1 = hf.effectiveTypeAgainst((String) move.get("type"),
+                    battlingPokemon[starting ^ 1].getType1());
+            double effectiveAgainstType2 = hf.effectiveTypeAgainst((String) move.get("type"),
+                    battlingPokemon[starting ^ 1].getType2());
+
+            double STAB = battlingPokemon[starting ^ 1].sameTypeAttackBase((String) move.get("type"));
+
             int damage = hf.damageFormula(battlingPokemon[starting].getLevel(),
-                    power,
-                    attackingStat, defendingStat, effectiveAgainstType1, effectiveAgainstType2,
+                    power, attackingStat, defendingStat, effectiveAgainstType1, effectiveAgainstType2,
                     battlingPokemon[starting].getCritChance(), STAB);
 
             System.out.println("Move Category: " + move.get("category"));
