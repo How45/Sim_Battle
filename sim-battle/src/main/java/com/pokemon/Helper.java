@@ -27,25 +27,30 @@ public class Helper {
             { 1, 1, 1, 1, 1, 1, 0.5, 1, 1, 1, 2, 1, 1, 2, 1, 0.5, 0.5 },
             { 1, 0.5, 0.5, 0.5, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 0.5 } };
 
-    public int damageFormula(int level, int power, int attackStat, int defenseStat, double type1,
+    public int damageFormula(double level, double power, double attackStat, double defenseStat, double type1,
             double type2, double critChance, double stab) {
         Random random = new Random();
         double critRandom = random.nextDouble();
-        double randomModif = (217 + random.nextInt(39)) / 255.0; // Random between 217 and 255, divided by 255
+        double randomModif = (217.0 + random.nextInt(38)) / 255.0; // Random between 217 and 255, divided by 255
 
-        int critical = (critRandom < critChance) ? 2 : 1;
+        double critical = (critRandom < critChance) ? 2.0 : 1.0;
 
         // Basic damage
-        int damage = (int) ((((2 * level * critical) / 5.0 + 2) * power * (attackStat / defenseStat)) / 50) + 2;
+        double part1 = ((2.0 * level * critical) / 5.0);
+        double stat = attackStat / defenseStat;
+        double part2 = (part1 + 2.0) * power * stat;
+        double damage = ((part2 / 50.0) + 2.0);
 
         // Modifier
+        damage *= stab;
+        damage *= type1;
+        damage *= type2;
         damage *= randomModif;
-        if (critical == 1) {
-            damage *= stab;
-        }
-        damage *= type1 * type2;
+        // for (int i = 217; i <= 255; i++){
+        // System.out.println(Math.floor((damage*i)/255));
+        // }
 
-        return Math.max(1, damage);
+        return Math.max(1, (int) damage);
     }
 
     public double effectiveTypeAgainst(String attackType, String defenceType) {

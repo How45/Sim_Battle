@@ -44,7 +44,7 @@ public class App {
                     }
 
                     // Switch to next pokemon
-                    starting = starting ^ 1;
+                    starting ^= 1;
                 }
                 rounds++;
             }
@@ -74,8 +74,10 @@ public class App {
         } else {
 
             String moveStatAttack = move.get("category").equals("special") ? "special-attack" : "attack";
-            // Gen 1 Pokemon special is the same. User will have to specify if they are doing gen 1 or not.
-            // Code will only change when calculation baselevelstat is changed at python level.
+            // Gen 1 Pokemon special is the same. User will have to specify if they are
+            // doing gen 1 or not.
+            // Code will only change when calculation baselevelstat is changed at python
+            // level.
             String moveStatDefense = move.get("category").equals("special") ? "special-defense" : "defense";
             int attackingStat = (int) (long) battlingPokemon[starting].getStat(moveStatAttack);
             int defendingStat = (int) (long) battlingPokemon[starting ^ 1].getStat(moveStatDefense);
@@ -85,7 +87,7 @@ public class App {
             double effectiveAgainstType2 = hf.effectiveTypeAgainst((String) move.get("type"),
                     battlingPokemon[starting ^ 1].getType2());
 
-            double STAB = battlingPokemon[starting ^ 1].sameTypeAttackBase((String) move.get("type"));
+            double STAB = battlingPokemon[starting].sameTypeAttackBase((String) move.get("type"));
 
             int damage = hf.damageFormula(battlingPokemon[starting].getLevel(),
                     power, attackingStat, defendingStat, effectiveAgainstType1, effectiveAgainstType2,

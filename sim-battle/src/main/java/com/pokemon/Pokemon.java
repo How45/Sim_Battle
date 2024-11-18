@@ -125,8 +125,8 @@ public class Pokemon {
     }
 
     public double sameTypeAttackBase(String moveType) {
-        double typeEffectivenessType1 = moveType == this.type1 ? 1.5 : 1;
-        double typeEffectivenessType2 = moveType == this.type2 ? 1.5 : 1;
+        double typeEffectivenessType1 = moveType.equals(this.type1) ? 1.5 : 1;
+        double typeEffectivenessType2 = moveType.equals(this.type2) ? 1.5 : 1;
 
         return typeEffectivenessType1 > typeEffectivenessType2 || typeEffectivenessType1 == typeEffectivenessType2
                 ? typeEffectivenessType1
