@@ -1,5 +1,9 @@
 package com.pokemon;
 
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
@@ -10,13 +14,13 @@ public class Pokemon {
 
     private String name;
     private int hp;
-    private JSONObject staticStats;
-    private JSONObject stats;
+    private JSONObject staticStats, stats;
     private JSONObject moveSet;
     private int level;
     private String effect;
-    private String type1;
-    private String type2;
+    private String type1, type2;
+    private int move1PositiveEffect, move2PositiveEffect, move3PositiveEffect;
+    private Set<Integer> weights = new HashSet<>();
 
     public Pokemon(String name, JSONObject stats,
             JSONObject moveSet, int level, String type1, String type2) {
@@ -37,6 +41,20 @@ public class Pokemon {
             e.printStackTrace();
             this.hp = 0;
         }
+
+        this.move1PositiveEffect = 100;
+        this.move2PositiveEffect = 100;
+        this.move3PositiveEffect = 100;
+
+        Map<String, Integer> statDeduction = new HashMap<String, Integer>() {
+            {
+                put("attack", 0);
+                put("defence", 0);
+                put("special", 0);
+                put("speed", 0);
+            }
+        };
+
     }
 
     public int getHealth() {
@@ -79,6 +97,24 @@ public class Pokemon {
         this.stats = this.staticStats;
         this.effect = null;
         this.hp = (int) (long) this.staticStats.get("hp");
+    }
+
+    public void setWeights(String stance) {
+        weights.clear();
+
+        if (stance.equals("aggressive")) {
+            weights.add(40); // Phyisical
+            weights.add(40); // Speical
+            weights.add(20); // Status
+        } else if (stance.equals("normal")) {
+            weights.add(33); // Phyisical
+            weights.add(33); // Speical
+            weights.add(33); // Status
+        } else {
+            weights.add(20); // Phyisical
+            weights.add(20); // Speical
+            weights.add(60); // Status
+        }
     }
 
     public JSONObject moveChoice() {
