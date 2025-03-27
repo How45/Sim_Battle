@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 class Game {
-    private int numRounds = 1;
+    private int roundNum = 1;
     private String pokemon1;
     private String pokemon2;
     private List<List<HashMap<String, Object>>> rounds;
@@ -19,7 +19,7 @@ class Game {
 
     public void addRound(List<HashMap<String, Object>> round) {
         this.rounds.add(round);
-        numRounds++;
+        roundNum++;
     }
 
     public List<List<HashMap<String, Object>>> getAllRounds() {

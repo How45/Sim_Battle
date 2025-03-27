@@ -1,6 +1,12 @@
 package com.pokemon;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
 import java.util.Random;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 // import org.json.simple.JSONObject;
 
@@ -58,7 +64,7 @@ public class Helper {
     }
 
     public int paralysisEffect(int pokeSpeed) {
-        return (int) (pokeSpeed - (Math.floor(pokeSpeed*.75)));
+        return (int) (pokeSpeed - (Math.floor(pokeSpeed * .75)));
     }
 
     private int sleepCount = 0;
@@ -105,5 +111,14 @@ public class Helper {
     public void resetPokemon(Pokemon[] battlingPokemon) {
         battlingPokemon[0].resetAll();
         battlingPokemon[1].resetAll();
+    }
+
+    public void exportGamesToJson(List<Game> games) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter writer = new FileWriter("sim-battle\\pokemon-data\\game_data.json")) {
+            gson.toJson(games, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

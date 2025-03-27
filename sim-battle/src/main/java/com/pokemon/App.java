@@ -78,13 +78,16 @@ public class App {
                             poke1round.put("isWinner", false);
                             poke2round.put("isWinner", true);
                         }
-
+                        starting ^= 1;
                         break;
                     }
 
                     // Switch to next pokemon
                     starting ^= 1;
                 }
+
+                poke1round.put("currentHp", battlingPokemon[starting].getHealth());
+                poke2round.put("currentHp", battlingPokemon[starting ^ 1].getHealth());
 
                 // What this HELL AM I doing. Not sure if this is good or not
                 round.add(poke1round);
@@ -108,6 +111,7 @@ public class App {
                 + battlingPokemon[1].getName() + ": "
                 + poke2Wins);
         // System.out.println("Game 1; Round 1; " + allGames.get(0).aRound(0));
+        hf.exportGamesToJson(allGames);
     }
 
     public static int getDamageMove(Pokemon[] battlingPokemon, JSONObject move, int starting) {
