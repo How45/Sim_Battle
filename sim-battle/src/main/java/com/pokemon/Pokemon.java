@@ -17,7 +17,7 @@ public class Pokemon {
     private JSONObject staticStats, stats;
     private JSONObject moveSet;
     private int level;
-    private String effect;
+    private String effect = null;
     private String type1, type2;
     private int move1PositiveEffect, move2PositiveEffect, move3PositiveEffect;
     private Set<Integer> weights = new HashSet<>();
@@ -29,7 +29,6 @@ public class Pokemon {
         this.stats = stats;
         this.moveSet = moveSet;
         this.level = level;
-        this.effect = null;
         this.type1 = type1;
         this.type2 = type2;
 
@@ -95,7 +94,7 @@ public class Pokemon {
 
     public void resetAll() {
         this.stats = this.staticStats;
-        this.effect = null;
+        effect = null;
         this.hp = (int) (long) this.staticStats.get("hp");
     }
 
@@ -103,16 +102,16 @@ public class Pokemon {
         weights.clear();
 
         if (stance.equals("aggressive")) {
-            weights.add(40); // Phyisical
-            weights.add(40); // Speical
+            weights.add(40); // Physical
+            weights.add(40); // Special
             weights.add(20); // Status
         } else if (stance.equals("normal")) {
-            weights.add(33); // Phyisical
-            weights.add(33); // Speical
+            weights.add(33); // Physical
+            weights.add(33); // Special
             weights.add(33); // Status
         } else {
-            weights.add(20); // Phyisical
-            weights.add(20); // Speical
+            weights.add(20); // Physical
+            weights.add(20); // Special
             weights.add(60); // Status
         }
     }
@@ -141,7 +140,7 @@ public class Pokemon {
     }
 
     public double getCritChance() {
-        // This is for the caclation of the critical chance in the damage formula
+        // This is for the calculations of the critical chance in the damage formula
         int speed;
 
         // Not sure if this try catch is needed

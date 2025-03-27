@@ -2,6 +2,9 @@ package com.pokemon;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -10,18 +13,30 @@ import org.json.simple.parser.ParseException;
 public class App {
     private static Pokemon[] battlingPokemon = new Pokemon[2];
     private static Helper hf = new Helper();
+    private static List<Game> allGames;
+    public static HashMap<String, Object> poke1round;
+    public static HashMap<String, Object> poke2round;
+    public static List<HashMap<String, Object>> round;
+    static int damage;
 
     public static void simBattle() throws Exception {
+        allGames = new ArrayList<>();
         int poke1Wins = 0;
         int poke2Wins = 0;
 
-        for (int battles = 0; battles < 1; battles++) {
-            int deadPokemon = 0; // Dunno how to have it blank, but probs wont be an issue
+        for (int battles = 0; battles < 10; battles++) {
+            Game inGame = new Game(battlingPokemon[0].getName(), battlingPokemon[1].getName());
+
+            int deadPokemon = 0; // Dunno how to have it blank, but probably wont be an issue
             int rounds = 0;
             boolean battleOver = false;
             int starting;
 
             while (!battleOver) {
+                round = new ArrayList<>();
+                poke1round = new HashMap<String, Object>();
+                poke2round = new HashMap<String, Object>();
+
                 System.out.println("\nRound: " + rounds);
                 JSONObject poke1Move = battlingPokemon[0].moveChoice();
                 JSONObject poke2Move = battlingPokemon[1].moveChoice();
@@ -31,21 +46,51 @@ public class App {
 
                 for (int i = 0; i < 2; i++) {
                     System.out.println(battlingPokemon[starting].getName() + "<---- ATTACKING");
-                    int damage = starting == 0 ? getDamageMove(battlingPokemon, poke1Move, starting)
-                            : getDamageMove(battlingPokemon, poke2Move, starting);
+                    if (i == 0) {
+                        poke1round.put("name", battlingPokemon[starting].getName());
+                        poke2round.put("name", battlingPokemon[starting ^ 1].getName());
+                        poke1round.put("started", true);
+                        poke2round.put("started", false);
+                    }
+
+                    if (starting == 0) {
+                        damage = getDamageMove(battlingPokemon, poke1Move, starting);
+                        poke1round.put("move", poke1Move);
+                        poke1round.put("damage", damage);
+                    } else {
+                        damage = getDamageMove(battlingPokemon, poke2Move, starting);
+                        poke2round.put("move", poke2Move);
+                        poke2round.put("damage", damage);
+                    }
 
                     System.out.println(battlingPokemon[starting].getName() + " did " + damage);
 
                     battlingPokemon[starting ^ 1].reduceHealth(damage);
+
                     if (battlingPokemon[starting ^ 1].isDead()) {
                         deadPokemon = starting ^ 1;
                         battleOver = true;
+
+                        if ((starting ^ 1) == 0) {
+                            poke1round.put("isWinner", false);
+                            poke2round.put("isWinner", true);
+                        } else {
+                            poke1round.put("isWinner", false);
+                            poke2round.put("isWinner", true);
+                        }
+
                         break;
                     }
 
                     // Switch to next pokemon
                     starting ^= 1;
                 }
+
+                // What this HELL AM I doing. Not sure if this is good or not
+                round.add(poke1round);
+                round.add(poke2round);
+                inGame.addRound(round);
+
                 rounds++;
             }
 
@@ -57,10 +102,12 @@ public class App {
             System.out.println("Game End, dead pokemon: " + battlingPokemon[deadPokemon].getName());
 
             hf.resetPokemon(battlingPokemon);
+            allGames.add(inGame);
         }
         System.out.println("\nWins - " + battlingPokemon[0].getName() + ": " + poke1Wins + " "
                 + battlingPokemon[1].getName() + ": "
                 + poke2Wins);
+        // System.out.println("Game 1; Round 1; " + allGames.get(0).aRound(0));
     }
 
     public static int getDamageMove(Pokemon[] battlingPokemon, JSONObject move, int starting) {
@@ -69,6 +116,17 @@ public class App {
         if (power == null) {
             // Status SHIT NEEDS TO BE DONE
             System.out.println("MINOR ERROR: " + move.get("category"));
+            if (starting == 0) {
+                poke1round.put("effectiveType1", null);
+                poke1round.put("effectiveType2", null);
+                poke1round.put("STAB", null);
+                poke1round.put("wasCrit", null);
+            } else {
+                poke2round.put("effectiveType1", null);
+                poke2round.put("effectiveType2", null);
+                poke2round.put("STAB", null);
+                poke2round.put("wasCrit", null);
+            }
             return 0;
 
         } else {
@@ -76,11 +134,11 @@ public class App {
             String moveStatAttack = move.get("category").equals("special") ? "special-attack" : "attack";
             // Gen 1 Pokemon special is the same. User will have to specify if they are
             // doing gen 1 or not.
-            // Code will only change when calculation baselevelstat is changed at python
+            // Code will only change when calculation base level stat is changed at python
             // level.
-            String moveStatDefense = move.get("category").equals("special") ? "special-defense" : "defense";
+            String moveStatDefence = move.get("category").equals("special") ? "special-defense" : "defense";
             int attackingStat = (int) (long) battlingPokemon[starting].getStat(moveStatAttack);
-            int defendingStat = (int) (long) battlingPokemon[starting ^ 1].getStat(moveStatDefense);
+            int defendingStat = (int) (long) battlingPokemon[starting ^ 1].getStat(moveStatDefence);
 
             double effectiveAgainstType1 = hf.effectiveTypeAgainst((String) move.get("type"),
                     battlingPokemon[starting ^ 1].getType1());
@@ -89,9 +147,23 @@ public class App {
 
             double STAB = battlingPokemon[starting].sameTypeAttackBase((String) move.get("type"));
 
+            double critChance = battlingPokemon[starting].getCritChance();
             int damage = hf.damageFormula(battlingPokemon[starting].getLevel(),
                     power, attackingStat, defendingStat, effectiveAgainstType1, effectiveAgainstType2,
-                    battlingPokemon[starting].getCritChance(), STAB);
+                    critChance, STAB);
+
+            System.out.println(starting);
+            if (starting == 0) {
+                poke1round.put("effectiveType1", effectiveAgainstType1);
+                poke1round.put("effectiveType2", effectiveAgainstType2);
+                poke1round.put("STAB", STAB);
+                poke1round.put("wasCrit", critChance);
+            } else {
+                poke2round.put("effectiveType1", effectiveAgainstType1);
+                poke2round.put("effectiveType2", effectiveAgainstType2);
+                poke2round.put("STAB", STAB);
+                poke2round.put("wasCrit", critChance);
+            }
 
             System.out.println("Move Category: " + move.get("category"));
             return damage;
