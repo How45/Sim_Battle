@@ -2,8 +2,11 @@ package com.pokemon;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+
+import org.json.simple.JSONObject;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -113,12 +116,49 @@ public class Helper {
         battlingPokemon[1].resetAll();
     }
 
-    public void exportGamesToJson(List<Game> games) {
+    public void exportGamesToJson(List<Game> battleSim) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         try (FileWriter writer = new FileWriter("sim-battle\\pokemon-data\\game_data.json")) {
-            gson.toJson(games, writer);
+            gson.toJson(battleSim, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void newExportToDB(List<Game> battleSim) {
+        // Export all of the simulated battle
+        JSONObject jsonP1 = battleSim.get(0).getPokemon(1).getAllStats();
+        JSONObject jsonP2 = battleSim.get(0).getPokemon(2).getAllStats();
+
+        String poke1Name = battleSim.get(0).getPokemon(0).getName();
+        String poke2Name = battleSim.get(0).getPokemon(1).getName();
+        long poke1Level = battleSim.get(0).getPokemon(0).getLevel();
+        long poke2Level = battleSim.get(0).getPokemon(1).getLevel();
+        // System.out.println(jsonP1);
+
+        String simBattleName = "Test1";
+
+        // Start connection
+        SqlHelper db = new SqlHelper();
+        db.openConnection();
+
+        db.insertPokemon(poke1Name, (long) jsonP1.get("hp"), (long) jsonP1.get("attack"),
+                (long) jsonP1.get("defense"), (long) jsonP1.get("special-attack"), (long) jsonP1.get("special-defense"),
+                (long) jsonP1.get("speed"), poke1Level);
+        db.insertPokemon(poke2Name,
+                (long) jsonP2.get("hp"),
+                (long) jsonP2.get("attack"), (long) jsonP2.get("defense"), (long) jsonP2.get("special-attack"),
+                (long) jsonP2.get("special-defense"), (long) jsonP2.get("speed"),
+                poke2Level);
+        // DO A TRY CATCH WHEN ITS -1
+        db.insertSimulation(simBattleName,
+                db.getPokeId(poke1Name, poke1Level),
+                db.getPokeId(poke2Name, poke2Level));
+
+        db.closeConnection();
+    }
+
+    public void exportResultsToDB() {
+        ;
     }
 }

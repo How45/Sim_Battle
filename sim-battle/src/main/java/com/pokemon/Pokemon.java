@@ -88,7 +88,7 @@ public class Pokemon {
         return this.stats.get(typeOfStat);
     }
 
-    public Object getAllStats() {
+    public JSONObject getAllStats() {
         return this.stats;
     }
 

@@ -25,7 +25,7 @@ public class App {
         int poke2Wins = 0;
 
         for (int battles = 0; battles < 10; battles++) {
-            Game inGame = new Game(battlingPokemon[0].getName(), battlingPokemon[1].getName());
+            Game inGame = new Game(battlingPokemon[0], battlingPokemon[1]);
 
             int deadPokemon = 0; // Dunno how to have it blank, but probably wont be an issue
             int rounds = 0;
@@ -111,7 +111,8 @@ public class App {
                 + battlingPokemon[1].getName() + ": "
                 + poke2Wins);
         // System.out.println("Game 1; Round 1; " + allGames.get(0).aRound(0));
-        hf.exportGamesToJson(allGames);
+        // hf.exportGamesToJson(allGames);
+        hf.exportToDB(allGames);
     }
 
     public static int getDamageMove(Pokemon[] battlingPokemon, JSONObject move, int starting) {
