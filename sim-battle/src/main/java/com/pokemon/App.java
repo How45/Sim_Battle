@@ -25,7 +25,7 @@ public class App {
         int poke2Wins = 0;
 
         for (int battles = 0; battles < 10; battles++) {
-            Game inGame = new Game(battlingPokemon[0], battlingPokemon[1]);
+            Game inGame = new Game(battlingPokemon[0], battlingPokemon[1], "normal", "normal");
 
             int deadPokemon = 0; // Dunno how to have it blank, but probably wont be an issue
             int rounds = 0;
@@ -72,11 +72,13 @@ public class App {
                         battleOver = true;
 
                         if ((starting ^ 1) == 0) {
+                            inGame.setWinner(battlingPokemon[starting].getName());
                             poke1round.put("isWinner", false);
                             poke2round.put("isWinner", true);
                         } else {
-                            poke1round.put("isWinner", false);
-                            poke2round.put("isWinner", true);
+                            inGame.setWinner(battlingPokemon[starting ^ 1].getName());
+                            poke1round.put("isWinner", true);
+                            poke2round.put("isWinner", false);
                         }
                         starting ^= 1;
                         break;
@@ -112,7 +114,7 @@ public class App {
                 + poke2Wins);
         // System.out.println("Game 1; Round 1; " + allGames.get(0).aRound(0));
         // hf.exportGamesToJson(allGames);
-        hf.exportToDB(allGames);
+        hf.newExportToDB(allGames);
     }
 
     public static int getDamageMove(Pokemon[] battlingPokemon, JSONObject move, int starting) {

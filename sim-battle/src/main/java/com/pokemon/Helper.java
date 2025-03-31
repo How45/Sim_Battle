@@ -155,10 +155,22 @@ public class Helper {
                 db.getPokeId(poke1Name, poke1Level),
                 db.getPokeId(poke2Name, poke2Level));
 
+        exportResultsToDB(db, simBattleName, battleSim, poke1Name, poke2Name, poke1Level, poke2Level);
+
         db.closeConnection();
     }
 
-    public void exportResultsToDB() {
-        ;
+    public void exportResultsToDB(SqlHelper db, String simName, List<Game> battleSim, String poke1Name,
+            String poke2Name, long poke1Level, long poke2Level) {
+        for (int aGame = 0; aGame++ < battleSim.size();) {
+            String[] stances = battleSim.get(aGame).getBattleStance().split(",");
+            String gameWinner = battleSim.get(aGame).getWinner().equals(poke1Name) ? poke1Name : poke2Name;
+            long gameWinnerLevel = battleSim.get(aGame).getWinner().equals(poke1Name) ? poke1Level : poke2Level;
+
+            db.insertBattleStance(db.getSimId(simName), stances[0], stances[1],
+                    db.getPokeId(gameWinner, gameWinnerLevel));
+
+            db.insertRound();
+        }
     }
 }
