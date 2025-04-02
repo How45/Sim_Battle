@@ -112,9 +112,12 @@ public class App {
         System.out.println("\nWins - " + battlingPokemon[0].getName() + ": " + poke1Wins + " "
                 + battlingPokemon[1].getName() + ": "
                 + poke2Wins);
-        // System.out.println("Game 1; Round 1; " + allGames.get(0).aRound(0));
+        // for (int round = 0; round++ < (allGames.get(0).getAllRounds().size() - 1);) {
+        // System.out.println("Game 1; Round " + round + "; " +
+        // allGames.get(0).aRound(round) + "\n");
+        // }
         // hf.exportGamesToJson(allGames);
-        hf.newExportToDB(allGames);
+        hf.newSimToDB(allGames);
     }
 
     public static int getDamageMove(Pokemon[] battlingPokemon, JSONObject move, int starting) {

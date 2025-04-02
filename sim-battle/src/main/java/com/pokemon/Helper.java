@@ -125,7 +125,7 @@ public class Helper {
         }
     }
 
-    public void newExportToDB(List<Game> battleSim) {
+    public void newSimToDB(List<Game> battleSim) throws Exception {
         // Export all of the simulated battle
         JSONObject jsonP1 = battleSim.get(0).getPokemon(1).getAllStats();
         JSONObject jsonP2 = battleSim.get(0).getPokemon(2).getAllStats();
@@ -144,33 +144,55 @@ public class Helper {
 
         db.insertPokemon(poke1Name, (long) jsonP1.get("hp"), (long) jsonP1.get("attack"),
                 (long) jsonP1.get("defense"), (long) jsonP1.get("special-attack"), (long) jsonP1.get("special-defense"),
-                (long) jsonP1.get("speed"), poke1Level);
+                (long) jsonP1.get("speed"), poke1Level, null);
         db.insertPokemon(poke2Name,
                 (long) jsonP2.get("hp"),
                 (long) jsonP2.get("attack"), (long) jsonP2.get("defense"), (long) jsonP2.get("special-attack"),
                 (long) jsonP2.get("special-defense"), (long) jsonP2.get("speed"),
-                poke2Level);
+                poke2Level, null);
         // DO A TRY CATCH WHEN ITS -1
         db.insertSimulation(simBattleName,
                 db.getPokeId(poke1Name, poke1Level),
                 db.getPokeId(poke2Name, poke2Level));
 
-        exportResultsToDB(db, simBattleName, battleSim, poke1Name, poke2Name, poke1Level, poke2Level);
+        exportGameToDB(db, simBattleName, battleSim, poke1Name, poke2Name, poke1Level, poke2Level);
 
         db.closeConnection();
     }
 
-    public void exportResultsToDB(SqlHelper db, String simName, List<Game> battleSim, String poke1Name,
-            String poke2Name, long poke1Level, long poke2Level) {
-        for (int aGame = 0; aGame++ < battleSim.size();) {
-            String[] stances = battleSim.get(aGame).getBattleStance().split(",");
-            String gameWinner = battleSim.get(aGame).getWinner().equals(poke1Name) ? poke1Name : poke2Name;
-            long gameWinnerLevel = battleSim.get(aGame).getWinner().equals(poke1Name) ? poke1Level : poke2Level;
+    public void exportGameToDB(SqlHelper db, String simName, List<Game> battleSim, String poke1Name,
+            String poke2Name, long poke1Level, long poke2Level) throws Exception {
 
-            db.insertBattleStance(db.getSimId(simName), stances[0], stances[1],
-                    db.getPokeId(gameWinner, gameWinnerLevel));
+        String[] stances = battleSim.get(0).getBattleStance().split(",");
+        String gameWinner = battleSim.get(0).getWinner().equals(poke1Name) ? poke1Name : poke2Name;
+        long gameWinnerLevel = battleSim.get(0).getWinner().equals(poke1Name) ? poke1Level : poke2Level;
+        int poke1Id = db.getPokeId(poke1Name, poke1Level);
+        int poke2Id = db.getPokeId(poke2Name, poke2Level);
 
-            db.insertRound();
+        int simId = db.getSimId(simName);
+        db.insertBattleStance(simId, stances[0], stances[1]);
+
+        for (int aGame = 0; aGame++ < (battleSim.size() - 1);) {
+            int stanceId = db.getStanceId(simId);
+            db.insertGame(stanceId, aGame, "NULL");
+            List<List<HashMap<String, Object>>> rounds = battleSim.get(aGame).getAllRounds();
+
+            for (int round = 0; round++ < (rounds.size() - 1);) {
+                List<HashMap<String, Object>> bothPokemonRoundData = battleSim.get(aGame).aRound(round);
+
+                db.insertRound(aGame, round, poke1Id, poke2Id, "NULL", "NULL",
+                        (Boolean) bothPokemonRoundData.get(0).get("started"),
+                        (Integer) bothPokemonRoundData.get(0).get("damage"),
+                        (Double) bothPokemonRoundData.get(0).get("wasCrit"),
+                        (Integer) bothPokemonRoundData.get(0).get("currentHp"),
+                        (Boolean) bothPokemonRoundData.get(0).get("isWinner"));
+                db.insertRound(aGame, round, poke2Id, poke1Id, "NULL", "NULL",
+                        (Boolean) bothPokemonRoundData.get(1).get("started"),
+                        (Integer) bothPokemonRoundData.get(1).get("damage"),
+                        (Double) bothPokemonRoundData.get(1).get("wasCrit"),
+                        (Integer) bothPokemonRoundData.get(1).get("currentHp"),
+                        (Boolean) bothPokemonRoundData.get(1).get("isWinner"));
+            }
         }
     }
 }
